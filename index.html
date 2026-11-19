@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cálculo en Movimiento</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+</head>
+
+<body>
+
+    <!-- =====================================================
+         FONDO ESPACIAL
+    ====================================================== -->
+
+    <div class="space-background" aria-hidden="true">
+
+
+        <!-- Estrellas, nebulosas y Vía Láctea (las dibuja fondo.js) -->
+
+        <canvas id="campoEstrellas" class="campo-estrellas"></canvas>
+
+
+        <!-- Estrellas que titilan (las crea fondo.js) -->
+
+        <div id="destellosEstrellas" class="capa-destellos"></div>
+
+
+        <!-- CAPA LEJANA: sol, galaxia y planeta helado -->
+
+        <div class="capa-fondo capa-lejana">
+
+            <div class="sol">
+                <div class="sol-destello"></div>
+            </div>
+
+            <div class="galaxia">
+                <canvas id="lienzoGalaxia" class="galaxia-giro"></canvas>
+            </div>
+
+            <div class="planeta planeta-helado"></div>
+
+        </div>
+
+
+        <!-- CAPA MEDIA: planeta con anillos y su luna, planeta rocoso -->
+
+        <div class="capa-fondo capa-media">
+
+            <div class="planeta-anillado">
+
+                <div class="anillo anillo-trasero"></div>
+
+                <div class="planeta planeta-gaseoso">
+                    <div class="planeta-superficie"></div>
+                    <div class="planeta-sombra"></div>
+                </div>
+
+                <div class="anillo anillo-delantero"></div>
+
+                <div class="luna-orbita">
+                    <div class="luna"></div>
+                </div>
+
+            </div>
+
+            <div class="planeta planeta-rocoso">
+                <div class="planeta-superficie"></div>
+                <div class="planeta-sombra"></div>
+            </div>
+
+        </div>
+
+
+        <!-- ESTRELLAS FUGACES -->
+
+        <div class="capa-fugaces">
+            <span class="estrella-fugaz fugaz-1"></span>
+            <span class="estrella-fugaz fugaz-2"></span>
+            <span class="estrella-fugaz fugaz-3"></span>
+            <span class="estrella-fugaz fugaz-4"></span>
+            <span class="estrella-fugaz fugaz-5"></span>
+            <span class="estrella-fugaz fugaz-6"></span>
+        </div>
+
+
+        <!-- CAPA CERCANA: satélites que cruzan la pantalla -->
+
+        <div class="capa-fondo capa-cercana">
+
+            <div class="ruta-satelite ruta-1">
+                <div class="satelite">
+                    <span class="satelite-panel"></span>
+                    <span class="satelite-cuerpo"></span>
+                    <span class="satelite-panel"></span>
+                    <span class="satelite-luz"></span>
+                </div>
+            </div>
+
+            <div class="ruta-satelite ruta-2">
+                <div class="satelite satelite-pequeno">
+                    <span class="satelite-panel"></span>
+                    <span class="satelite-cuerpo"></span>
+                    <span class="satelite-panel"></span>
+                    <span class="satelite-luz"></span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- TIERRA con un satélite en órbita -->
+
+        <div class="capa-fondo capa-tierra">
+
+            <div class="earth-container">
+
+                <div class="earth">
+                    <div class="earth-superficie"></div>
+                    <div class="earth-sombra"></div>
+                </div>
+
+                <div class="earth-glow"></div>
+
+                <div class="orbita-satelite">
+                    <div class="satelite satelite-orbital">
+                        <span class="satelite-panel"></span>
+                        <span class="satelite-cuerpo"></span>
+                        <span class="satelite-panel"></span>
+                        <span class="satelite-luz"></span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Viñeta: oscurece un poco los bordes, como en el cine -->
+
+        <div class="vineta"></div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INTERFAZ
+    ====================================================== -->
+
+    <main class="interface">
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <header class="top-header">
+
+            <div>
+
+                <span class="system-line">
+                    CALCULUS // INTERACTIVE SYSTEM
+                </span>
+
+                <h1>
+                    CÁLCULO EN MOVIMIENTO
+                </h1>
+
+                <p>
+                    MATEMÁTICAS INTERACTIVAS CON TUS GESTOS
+                </p>
+
+            </div>
+
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+
+                    <small>
+                        SISTEMA
+                    </small>
+
+                    <strong>
+                        ACTIVO
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             INGRESO DE FUNCIÓN
+        ================================================== -->
+
+        <section class="function-input-box">
+
+            <div class="function-input-title">
+
+                <div>
+
+                    <span class="section-title">
+                        INGRESAR FUNCIÓN
+                    </span>
+
+                    <small>
+                        ESCRIBE LA FUNCIÓN QUE DESEAS ANALIZAR
+                    </small>
+
+                </div>
+
+                <div class="control-mode" role="group" aria-label="Modalidad de control">
+                    <button
+                        type="button"
+                        class="control-mode-option is-selected"
+                        data-control-mode="gestos"
+                        aria-pressed="true"
+                    >Gestos</button>
+                    <button
+                        type="button"
+                        class="control-mode-option"
+                        data-control-mode="manual"
+                        aria-pressed="false"
+                    >Manual</button>
+                </div>
+
+            </div>
+
+
+            <div class="function-input-area">
+
+
+                <div class="input-wrapper">
+
+                    <span class="input-prefix">
+                        f(x) =
+                    </span>
+
+                    <input
+                        type="text"
+                        id="entradaFuncion"
+                        placeholder="Ej: x^2 + 3x"
+                        autocomplete="off"
+                    >
+
+                    <button
+                        id="botonSimbolos"
+                        class="symbol-toggle"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="panelSimbolos"
+                    >Símbolos</button>
+
+                    <div
+                        class="symbol-panel"
+                        id="panelSimbolos"
+                        role="group"
+                        aria-label="Teclado de símbolos matemáticos"
+                        hidden
+                    >
+                        <div class="symbol-group">
+                            <span>OPERADORES</span>
+                            <div class="symbol-keys">
+                                <button type="button" class="symbol-key" data-insert="x">x</button>
+                                <button type="button" class="symbol-key" data-insert="y">y</button>
+                                <button type="button" class="symbol-key" data-insert="^">x<sup>y</sup></button>
+                                <button type="button" class="symbol-key" data-insert="π">π</button>
+                                <button type="button" class="symbol-key" data-insert="e">e</button>
+                                <button type="button" class="symbol-key" data-insert="(">(</button>
+                                <button type="button" class="symbol-key" data-insert=")">)</button>
+                                <button type="button" class="symbol-key" data-insert="+">+</button>
+                                <button type="button" class="symbol-key" data-insert="-">−</button>
+                                <button type="button" class="symbol-key" data-insert="*">×</button>
+                                <button type="button" class="symbol-key" data-insert="/">÷</button>
+                                <button type="button" class="symbol-key" data-insert="||" data-caret-offset="1" aria-label="Valor absoluto">|·|</button>
+                            </div>
+                        </div>
+                        <div class="symbol-group">
+                            <span>FUNCIONES</span>
+                            <div class="symbol-keys">
+                                <button type="button" class="symbol-key" data-insert="sqrt()" data-caret-offset="5" aria-label="Raíz cuadrada">√</button>
+                                <button type="button" class="symbol-key" data-insert="sin()" data-caret-offset="4">sin</button>
+                                <button type="button" class="symbol-key" data-insert="cos()" data-caret-offset="4">cos</button>
+                                <button type="button" class="symbol-key" data-insert="tan()" data-caret-offset="4">tan</button>
+                                <button type="button" class="symbol-key" data-insert="csc()" data-caret-offset="4">csc</button>
+                                <button type="button" class="symbol-key" data-insert="sec()" data-caret-offset="4">sec</button>
+                                <button type="button" class="symbol-key" data-insert="cot()" data-caret-offset="4">cot</button>
+                                <button type="button" class="symbol-key" data-action="log">log</button>
+                                <button type="button" class="symbol-key" data-insert="ln()" data-caret-offset="3">ln</button>
+                                <button type="button" class="symbol-key" data-insert="abs()" data-caret-offset="4">abs</button>
+                            </div>
+                        </div>
+                        <button
+                            class="symbol-panel-close"
+                            type="button"
+                            aria-label="Cerrar teclado de símbolos"
+                        >Cerrar</button>
+                    </div>
+
+                    <div
+                        class="log-entry-panel"
+                        id="panelIngresoLog"
+                        role="group"
+                        aria-label="Opciones de ingreso de logaritmo"
+                        hidden
+                    >
+                        <div id="opcionesIngresoLog">
+                            <span class="log-entry-question">¿Cómo deseas ingresar el logaritmo?</span>
+                            <div class="log-entry-actions">
+                                <button type="button" class="log-entry-button" data-log-choice="base">Con base</button>
+                                <button type="button" class="log-entry-button" data-log-choice="sin-base">Sin base</button>
+                                <button type="button" class="log-entry-button log-entry-cancel" data-log-choice="cancelar">Cancelar</button>
+                            </div>
+                        </div>
+                        <form id="formularioBaseLog" hidden>
+                            <label class="log-entry-question" for="baseLog">Escribe una base mayor que cero y distinta de 1</label>
+                            <div class="log-entry-base-row">
+                                <input id="baseLog" type="number" min="0" step="any" inputmode="decimal" aria-describedby="errorBaseLog">
+                                <button type="submit" class="log-entry-button">Listo</button>
+                                <button type="button" class="log-entry-button log-entry-cancel" data-log-choice="cancelar">Cancelar</button>
+                            </div>
+                            <span class="log-entry-error" id="errorBaseLog" role="status" aria-live="polite"></span>
+                        </form>
+                    </div>
+
+                </div>
+
+
+                <button
+                    id="aplicarFuncion"
+                    class="apply-function-button"
+                    type="button"
+                >
+
+                    <span>
+                        ✓
+                    </span>
+
+                    APLICAR FUNCIÓN
+
+                </button>
+
+
+            </div>
+
+
+            <div class="function-input-help">
+
+                <span>
+                    EJEMPLOS:
+                </span>
+
+                <code>x^2</code>
+                <code>x^3</code>
+                <code>sqrt(x + 1)</code>
+                <code>x/(x+1)</code>
+                <code>sin(x)</code>
+                <code>cos(x)</code>
+                <code>ln(x)</code>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FUNCIÓN ACTIVA
+        ================================================== -->
+
+        <section class="function-box">
+
+
+            <div>
+
+                <span class="section-title">
+                    FUNCIÓN ACTIVA
+                </span>
+
+                <div class="function-value">
+
+                    <span>
+                        f(x) =
+                    </span>
+
+                    <strong id="funcionActiva">
+                        ————————————————
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="point-evaluation-box"
+                id="evaluacionPunto"
+                aria-labelledby="tituloEvaluacionPunto"
+                hidden
+            >
+                <label
+                    class="point-evaluation-title"
+                    id="tituloEvaluacionPunto"
+                    for="valorEvaluacionX"
+                >Evaluar punto</label>
+                <div class="point-input-wrapper">
+                    <span>x =</span>
+                    <input
+                        id="valorEvaluacionX"
+                        type="number"
+                        step="any"
+                        inputmode="decimal"
+                        placeholder="Valor"
+                        aria-label="Valor de x para evaluar"
+                    >
+                </div>
+            </div>
+
+
+            <div class="domain-box">
+
+                <strong id="dominio">
+                    Dominio: —————————
+                </strong>
+
+            </div>
+
+
+            <div class="function-state">
+
+                <span class="section-title">
+                    ESTADO DEL SISTEMA
+                </span>
+
+                <strong id="estadoFuncion" aria-live="polite">
+                    LISTO PARA INTERACTUAR
+                </strong>
+
+            </div>
+
+        </section>
+
+        <section
+            class="manual-controls"
+            id="controlesManuales"
+            aria-label="Controles manuales de interacción"
+            hidden
+        >
+            <div class="manual-controls-heading">INTERACCIONES MATEMÁTICAS</div>
+            <div class="manual-action-buttons">
+                <button type="button" class="manual-action-button" data-manual-action="1">Evaluar punto</button>
+                <button type="button" class="manual-action-button" data-manual-action="2">Mostrar tangente</button>
+                <button type="button" class="manual-action-button" data-manual-action="3">Mostrar derivadas</button>
+                <button type="button" class="manual-action-button" data-manual-action="4">Puntos críticos</button>
+                <button type="button" class="manual-action-button" data-manual-action="5">Reto aplicado</button>
+                <button type="button" class="manual-pause-button" id="pausarControlManual">Pausar</button>
+            </div>
+        </section>
+
+
+        <!-- =================================================
+             ZONA CENTRAL
+        ================================================== -->
+
+        <section class="main-grid">
+
+
+            <!-- =================================================
+                 GRÁFICA
+            ================================================== -->
+
+            <div class="panel graph-panel">
+
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <span class="panel-code">
+                            MODULE 01
+                        </span>
+
+                        <h2>
+                            VISUALIZACIÓN GRÁFICA
+                        </h2>
+
+                    </div>
+
+
+                    <span class="live">
+                        ● LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="graph-container">
+
+
+                    <canvas id="grafica"></canvas>
+
+                    <div class="graph-grid"></div>
+
+
+                    <div class="graph-corner top-left"></div>
+
+                    <div class="graph-corner top-right"></div>
+
+                    <div class="graph-corner bottom-left"></div>
+
+                    <div class="graph-corner bottom-right"></div>
+
+
+                    <div
+                        class="graph-center-message"
+                        id="mensajeGrafica"
+                    >
+
+                        <span>
+                            f(x)
+                        </span>
+
+                        <p>
+                            VISUALIZACIÓN MATEMÁTICA
+                        </p>
+
+                        <small>
+                            ESPERANDO FUNCIÓN
+                        </small>
+
+                    </div>
+
+
+                    <div class="graph-status">
+                        GRAPH ENGINE // READY
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CÁMARA
+            ================================================== -->
+
+            <div class="panel camera-panel">
+
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <span class="panel-code">
+                            MODULE 02
+                        </span>
+
+                        <h2>
+                            DETECCIÓN DE MANOS
+                        </h2>
+
+                    </div>
+
+
+                    <span class="live tracking">
+                        ● TRACKING
+                    </span>
+
+                </div>
+
+
+                <div class="camera-container">
+
+
+                    <video
+                        id="camara"
+                        autoplay
+                        playsinline
+                    ></video>
+
+
+                    <canvas id="lienzo"></canvas>
+
+
+                    <div class="camera-grid"></div>
+
+
+                    <div class="camera-corners"></div>
+
+
+                    <div class="camera-label top">
+                        HAND TRACKING // LIVE
+                    </div>
+
+
+                    <div class="camera-label bottom">
+                        GESTURE DETECTION // LIVE
+                    </div>
+
+                    <div
+                        class="camera-status"
+                        id="estadoCamara"
+                        role="status"
+                        aria-live="polite"
+                        hidden
+                    >
+                        <span id="mensajeEstadoCamara"></span>
+                        <button
+                            type="button"
+                            id="reintentarCamara"
+                            hidden
+                        >Reintentar</button>
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ESTADOS DE MANOS
+                ================================================== -->
+
+                <div class="hands-status">
+
+
+                    <div class="hand-card right-hand">
+
+
+                        <div class="hand-title">
+
+                            <span class="hand-letter">
+                                R
+                            </span>
+
+
+                            <div>
+
+                                <strong>
+                                    MANO DERECHA
+                                </strong>
+
+                                <small>
+                                    CONTROL MATEMÁTICO
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="hand-data">
+
+
+                            <div>
+
+                                <span>
+                                    ESTADO
+                                </span>
+
+                                <strong id="estadoDerecha">
+                                    ESPERANDO
+                                </strong>
+
+                            </div>
+
+
+                            <div>
+
+                                <span>
+                                    DEDOS
+                                </span>
+
+                                <strong id="dedosDerecha">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="graph-zoom-controls hand-card">
+                        <div class="hand-title">
+                            <span class="hand-letter zoom-control-letter">↕</span>
+                            <div>
+                                <strong>CONTROL DE GRÁFICA</strong>
+                                <small>ZOOM Y VISTA</small>
+                            </div>
+                        </div>
+                        <div class="zoom-control-buttons" role="group" aria-label="Controles de zoom de la gráfica">
+                            <button
+                                id="alejarGrafica"
+                                class="zoom-control-button"
+                                type="button"
+                                aria-label="Alejar gráfica"
+                                title="Alejar gráfica"
+                            >−</button>
+                            <button
+                                id="acercarGrafica"
+                                class="zoom-control-button"
+                                type="button"
+                                aria-label="Acercar gráfica"
+                                title="Acercar gráfica"
+                            >+</button>
+                            <button
+                                id="restablecerVistaGrafica"
+                                class="zoom-control-button reset-graph-view"
+                                type="button"
+                                aria-label="Restablecer vista de la gráfica"
+                                title="Restablecer vista"
+                            >↻</button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             FLUJO
+        ================================================== -->
+
+        <section class="gesture-result">
+
+
+            <div class="result-block">
+
+                <span>
+                    GESTO DETECTADO
+                </span>
+
+                <strong id="gesto">
+                    ESPERANDO...
+                </strong>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <div class="result-block">
+
+                <span>
+                    ACCIÓN ACTUAL
+                </span>
+
+                <strong id="accion">
+                    ESPERANDO GESTO...
+                </strong>
+
+            </div>
+
+
+            <div class="arrow">
+                →
+            </div>
+
+
+            <div class="result-block result-final">
+
+                <span>
+                    RESULTADO
+                </span>
+
+                <strong id="resultado">
+                    Esperando gesto
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             BOTONES
+        ================================================== -->
+
+        <section class="controls">
+
+
+            <button
+                id="botonCamara"
+                class="control-button camera-button"
+            >
+
+                <span>
+                    ◉
+                </span>
+
+                ACTIVAR CÁMARA
+
+            </button>
+
+
+            <button
+                id="reiniciar"
+                class="control-button restart-button"
+            >
+
+                <span>
+                    ↻
+                </span>
+
+                REINICIAR SISTEMA
+
+            </button>
+
+
+        </section>
+
+
+
+        <details class="instructions">
+            <summary>
+                <span>¿CÓMO UTILIZAR CÁLCULO EN MOVIMIENTO?</span>
+                <span class="instructions-toggle" aria-hidden="true">＋</span>
+            </summary>
+            <div class="instructions-content">
+                <section>
+                    <h3>Ingresar una función</h3>
+                    <p>Escribe una expresión de x (por ejemplo, <code>x^2 + 3x</code>) y pulsa «Aplicar función» o Enter. Desde «Símbolos», elige cómo ingresar <code>log</code>: con una base o sin base (base 10). <code>ln</code> representa el logaritmo natural.</p>
+                </section>
+                <section>
+                    <h3>Cámara y gestos</h3>
+                    <p>Pulsa «Activar cámara» y concede permiso. Muestra la mano derecha: 1 dedo evalúa el punto x; 2 muestra la tangente; 3 muestra las derivadas; 4 analiza los puntos críticos; 5 activa el reto aplicado.</p>
+                </section>
+                <section>
+                    <h3>Zoom y navegación</h3>
+                    <p>Usa «+» y «−» para acercar o alejar, «↻» para restablecer y arrastra la gráfica para desplazarla.</p>
+                </section>
+                <section>
+                    <h3>Uso sin cámara</h3>
+                    <p>Selecciona «Manual» para evaluar puntos, mostrar la tangente y derivadas, calcular puntos críticos o activar el reto aplicado. El botón «Pausar» suspende las acciones manuales hasta reanudar.</p>
+                </section>
+            </div>
+        </details>
+
+
+        <footer>
+
+            CÁLCULO EN MOVIMIENTO
+
+            <span>
+                // INTERACTIVE MATHEMATICS SYSTEM
+            </span>
+
+        </footer>
+
+
+    </main>
+
+
+    <div
+        class="warning-modal"
+        id="modalAdvertencia"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tituloAdvertencia"
+        aria-describedby="mensajeAdvertencia"
+        hidden
+    >
+        <div class="warning-modal-backdrop" data-cerrar-advertencia></div>
+        <section class="warning-modal-card">
+            <button
+                class="warning-modal-close"
+                id="cerrarAdvertenciaX"
+                type="button"
+                aria-label="Cerrar aviso"
+            >×</button>
+            <span class="warning-modal-label">AVISO MATEMÁTICO</span>
+            <h2 id="tituloAdvertencia">PUNTO NO DEFINIDO</h2>
+            <p id="mensajeAdvertencia"></p>
+            <button
+                class="warning-modal-dismiss"
+                id="cerrarAdvertencia"
+                type="button"
+            >Cerrar</button>
+        </section>
+    </div>
+
+
+    <script
+        src="fondo.js"
+    ></script>
+
+    <script
+        type="module"
+        src="script.js"
+    ></script>
+
+
+</body>
+
+</html>
